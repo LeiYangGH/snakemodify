@@ -41,7 +41,7 @@ class Food():
         for i in range(2):
             randX = round(random.randrange(0, width - segment_width) / 40) * 40
             randY = round(random.randrange(0, height - segment_height) / 40) * 40
-            print(f'x={randX}y={randY}')
+            #print(f'x={randX}y={randY}')
             fooditem = Food_item(randX, randY)
             self.fooditems.append(fooditem)
             self.spriteslist.add(fooditem)
@@ -150,7 +150,11 @@ while not done:
  
     # move snake one step
     my_snake.move()
-    
+
+    hit_list = pygame.sprite.spritecollide(my_snake.segments[0],food.spriteslist,True)
+    if hit_list:
+        print('eating!')
+
     # -- Draw everything
     # Clear screen
     screen.fill(BLACK)
@@ -161,6 +165,6 @@ while not done:
     pygame.display.flip()
  
     # Pause
-    clock.tick(5)
+    clock.tick(3)
  
 pygame.quit()
