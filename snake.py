@@ -34,6 +34,22 @@ segment_height = min(height, width) / 40 - segment_margin
 x_change = segment_width + segment_margin
 y_change = 0
 
+class Obstacle():
+    def __init__(self):
+        self.spriteslist = pygame.sprite.Group()
+        for i in range(2):
+            randX = round(random.randrange(0, width - segment_width) / 40) * 30
+            randY = round(random.randrange(0, height - segment_height) / 40) * 30 + 50
+            randw = round(random.randrange(0, 200))
+            randh = round(random.randrange(0, 200))
+            ob = pygame.sprite.Sprite()
+            ob.image = pygame.Surface([randw, randh])
+            ob.image.fill(RED)
+            ob.rect = ob.image.get_rect()
+            ob.rect.x = randX
+            ob.rect.y = randY
+
+            self.spriteslist.add(ob)
 
 class Food():
     def __init__(self):
@@ -142,6 +158,7 @@ pygame.display.set_caption('Snake Game')
 # Create an initial snake
 my_snake = Snake()
 food = Food()
+obstacle = Obstacle()
 clock = pygame.time.Clock()
 done = False
 
@@ -182,6 +199,7 @@ while not done:
     screen.fill(BLACK)
     my_snake.spriteslist.draw(screen)
     food.spriteslist.draw(screen)
+    obstacle.spriteslist.draw(screen)
 
     # Flip screen
     pygame.display.flip()
