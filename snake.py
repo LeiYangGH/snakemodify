@@ -33,7 +33,31 @@ segment_height = min(height, width) / 40 - segment_margin
 # Set initial speed
 x_change = segment_width + segment_margin
 y_change = 0
- 
+
+class Food():
+    def __init__(self):
+        self.fooditems = []
+        self.spriteslist = pygame.sprite.Group()
+        for i in range(2):
+            randX = round(random.randrange(0, width - segment_width) / 40) * 40
+            randY = round(random.randrange(0, height - segment_height) / 40) * 40
+            print(f'x={randX}y={randY}')
+            fooditem = Food_item(randX, randY)
+            self.fooditems.append(fooditem)
+            self.spriteslist.add(fooditem)
+
+
+class Food_item(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface([segment_width, segment_height])
+        self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+
+
 
 class Snake():
     """ Class to represent one snake. """
@@ -97,7 +121,7 @@ pygame.display.set_caption('Snake Game')
  
 # Create an initial snake
 my_snake = Snake()
- 
+food = Food()
 clock = pygame.time.Clock()
 done = False
  
@@ -131,7 +155,8 @@ while not done:
     # Clear screen
     screen.fill(BLACK)
     my_snake.spriteslist.draw(screen)
-    
+    food.spriteslist.draw(screen)
+
     # Flip screen
     pygame.display.flip()
  
