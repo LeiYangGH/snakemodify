@@ -47,6 +47,17 @@ class Food():
             self.fooditems.append(fooditem)
             self.spriteslist.add(fooditem)
 
+    def replenish(self):
+        randX = round(random.randrange(0, width - segment_width) / 40) * 40
+        randY = round(random.randrange(0, height - segment_height) / 40) * 40
+        fooditem = Food_item(randX, randY)
+        while pygame.sprite.spritecollide(fooditem, my_snake.spriteslist, False):
+            randX = round(random.randrange(0, width - segment_width) / 40) * 40
+            randY = round(random.randrange(0, height - segment_height) / 40) * 40
+            fooditem = Food_item(randX, randY)
+        self.fooditems.append(fooditem)
+        self.spriteslist.add(fooditem)
+
 
 class Food_item(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -164,6 +175,7 @@ while not done:
     if hit_list:
         print('eating!')
         my_snake.grow()
+        food.replenish()
 
     # -- Draw everything
     # Clear screen
