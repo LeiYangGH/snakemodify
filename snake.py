@@ -33,6 +33,12 @@ segment_height = min(height, width) / 40 - segment_margin
 # Set initial speed
 x_change = segment_width + segment_margin
 y_change = 0
+score = 0
+
+
+# def update_score(score):
+#     text = font.render(f"SCORE:{score}", True, black)
+#     gameDisplay.blit(text, [0, 0])
 
 class Obstacle():
     def __init__(self):
@@ -50,6 +56,7 @@ class Obstacle():
             ob.rect.y = randY
 
             self.spriteslist.add(ob)
+
 
 class Food():
     def __init__(self):
@@ -148,9 +155,10 @@ class Segment(pygame.sprite.Sprite):
 
 # Call this function so the Pygame library can initialize itself
 pygame.init()
+font = pygame.font.SysFont('comicsansms', 48)
 
 # Create a 600x600 sized screen
-screen = pygame.display.set_mode([width, height])
+screen = pygame.display.set_mode([width, height + 150])
 
 # Set the title of the window
 pygame.display.set_caption('Snake Game')
@@ -193,6 +201,7 @@ while not done:
         print('eating!')
         my_snake.grow()
         food.replenish()
+        score += 1
 
     # -- Draw everything
     # Clear screen
@@ -201,6 +210,11 @@ while not done:
     food.spriteslist.draw(screen)
     obstacle.spriteslist.draw(screen)
 
+    text = font.render('Score = ' + str(score), True, (255, 0, 0))
+    textrect = text.get_rect()
+    textrect.centerx = 200
+    textrect.centery = 700
+    screen.blit(text, textrect)
     # Flip screen
     pygame.display.flip()
 
