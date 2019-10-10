@@ -36,10 +36,6 @@ y_change = 0
 score = 0
 
 
-# def update_score(score):
-#     text = font.render(f"SCORE:{score}", True, black)
-#     gameDisplay.blit(text, [0, 0])
-
 class Obstacle():
     def __init__(self):
         self.spriteslist = pygame.sprite.Group()
@@ -99,12 +95,15 @@ class Snake():
     def __init__(self):
         self.segments = []
         self.spriteslist = pygame.sprite.Group()
+        self.without_head_spriteslist = pygame.sprite.Group()
+        # is_head = True
         for i in range(15):
             x = (segment_width + segment_margin) * 30 - (segment_width + segment_margin) * i
             y = (segment_height + segment_margin) * 2
             segment = Segment(x, y)
             self.segments.append(segment)
             self.spriteslist.add(segment)
+
 
     def move(self):
         # Figure out where new segment will be
@@ -169,56 +168,82 @@ food = Food()
 obstacle = Obstacle()
 clock = pygame.time.Clock()
 done = False
+game_ended = False
 
 while not done:
+    # print('while not done')
+    if game_ended:
+        print('game_ended')
+        screen.fill(WHITE)
+        text = font.render('Game Over', True, (255, 0, 0))
+        textrect = text.get_rect()
+        textrect.centerx = 300
+        textrect.centery = 300
+        screen.blit(text, textrect)
+        pygame.display.update()
+        while game_ended and not done:
+            for event in pygame.event.get():
+                # print('while game_ended for event')
+                if event.type == pygame.QUIT:
+                    print('done = True')
+                    done = True
+    else:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
+            # Set the direction based on the key pressed
+            # We want the speed to be enough that we move a full
+            # segment, plus the margin.
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    x_change = (segment_width + segment_margin) * -1
+                    y_change = 0
+                if event.key == pygame.K_RIGHT:
+                    x_change = (segment_width + segment_margin)
+                    y_change = 0
+                if event.key == pygame.K_UP:
+                    x_change = 0
+                    y_change = (segment_height + segment_margin) * -1
+                if event.key == pygame.K_DOWN:
+                    x_change = 0
+                    y_change = (segment_height + segment_margin)
+        head_rect = my_snake.segments[0].rect
+        # print(head_rect)
+        snake_spriteslist_without_head = pygame.sprite.Group()
+        [snake_spriteslist_without_head.add(seg) for seg in my_snake.segments[1:]]
+        if head_rect.x <= 15 or head_rect.y <= 15 or head_rect.x >= 580 or head_rect.y >= 580 \
+                or pygame.sprite.spritecollide(my_snake.segments[0], obstacle.spriteslist, False) \
+                or pygame.sprite.spritecollide(my_snake.segments[0], snake_spriteslist_without_head, False):
+            game_ended = True
 
-        # Set the direction based on the key pressed
-        # We want the speed to be enough that we move a full
-        # segment, plus the margin.
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                x_change = (segment_width + segment_margin) * -1
-                y_change = 0
-            if event.key == pygame.K_RIGHT:
-                x_change = (segment_width + segment_margin)
-                y_change = 0
-            if event.key == pygame.K_UP:
-                x_change = 0
-                y_change = (segment_height + segment_margin) * -1
-            if event.key == pygame.K_DOWN:
-                x_change = 0
-                y_change = (segment_height + segment_margin)
+        # move snake one step
+        my_snake.move()
 
-    # move snake one step
-    my_snake.move()
+        hit_list = pygame.sprite.spritecollide(my_snake.segments[0], food.spriteslist, True)
+        if hit_list:
+            print('eating!')
+            my_snake.grow()
+            food.replenish()
+            score += 1
 
-    hit_list = pygame.sprite.spritecollide(my_snake.segments[0], food.spriteslist, True)
-    if hit_list:
-        print('eating!')
-        my_snake.grow()
-        food.replenish()
-        score += 1
+        # -- Draw everything
+        # Clear screen
+        screen.fill(BLACK)
+        my_snake.spriteslist.draw(screen)
+        food.spriteslist.draw(screen)
+        obstacle.spriteslist.draw(screen)
+        empty_rect = pygame.Rect(3, 3, width - 6, height - 6)
+        pygame.draw.rect(screen, (255, 255, 255), empty_rect, 3)
+        text = font.render('Score = ' + str(score), True, (255, 0, 0))
+        textrect = text.get_rect()
+        textrect.centerx = 200
+        textrect.centery = 700
+        screen.blit(text, textrect)
+        # Flip screen
+        pygame.display.flip()
 
-    # -- Draw everything
-    # Clear screen
-    screen.fill(BLACK)
-    my_snake.spriteslist.draw(screen)
-    food.spriteslist.draw(screen)
-    obstacle.spriteslist.draw(screen)
-
-    text = font.render('Score = ' + str(score), True, (255, 0, 0))
-    textrect = text.get_rect()
-    textrect.centerx = 200
-    textrect.centery = 700
-    screen.blit(text, textrect)
-    # Flip screen
-    pygame.display.flip()
-
-    # Pause
-    clock.tick(3)
+        # Pause
+        clock.tick(5)
 
 pygame.quit()
